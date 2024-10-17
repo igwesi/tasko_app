@@ -22,28 +22,58 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
   }
 }
-import Theme from "./components/Theme";
 
-export default function RootLayout({
-  children,
-}: Readonly<{
+import Theme from "../components/Theme";
+import Navbar from "@/components/Navbar";
+
+export default function RootLayout({children,}: Readonly<{
   children: React.ReactNode;
 }>) {
+  
   return (
     <html lang="en" data-theme="emerald">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]"> 
-          
-          <div className="flex flex-col w-full items-end mx-auto">
-            <Theme/>
+        <div className="flex flex-col items-center justify-items-center min-h-screen max-h-screen p-8 pb-8 gap-20 font-[family-name:var(--font-geist-sans)]">       
+          <div className="flex flex-row w-full justify-between items-center">
+            <div className="items-start my-auto">
+              <Navbar/>
+            </div>
+            <div className="items-end my-auto">
+              <Theme/>
+            </div>
           </div>
-
-          <main className="flex flex-row w-full">
+          
+          <main className="flex flex-row w-full items-center justify-center">
             {children}
           </main>
 
-          <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center"></footer>
+          <footer className="row-start-3 gap-6 absolute bottom-10">
+            <div className="flex row-start-3 gap-9">
+              <a
+                href="https://github.com/igwesi/Tasko"
+                className="text-sm hover:underline"
+                target="_blank"
+              >
+                Powered by Tasko
+              </a>
+
+              <a
+                href="https://github.com/igwesi"
+                className="text-sm hover:underline"
+                target="_blank"
+              >
+                Created by @igwesi
+              </a>
+              <a
+                href="https://github.com/igwesi/Tasko/blob/main/LICENSE"
+                className="text-sm hover:underline"
+                target="_blank"
+              >
+                MIT License
+              </a>
+            </div>
+          </footer>
         </div>
       </body>
     </html>
