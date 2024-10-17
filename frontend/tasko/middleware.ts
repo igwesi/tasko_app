@@ -1,10 +1,11 @@
+"use client";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { ACCESS_TOKEN } from "./constants";
 
 
 export function middleware(request: NextRequest) {
-    const accessToken = localStorage.getItem(ACCESS_TOKEN);
+    const accessToken = null
 
     if (
         !accessToken 
