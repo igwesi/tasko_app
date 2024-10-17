@@ -41,6 +41,9 @@ Libraries:
     npm install @radix-ui/themes
     - https://www.radix-ui.com/themes/docs/overview/getting-started
     - https://headlessui.com/react/button
+    - https://daisyui.com/components/swap/n
+
+    -https://www.react-hook-form.com/ts/
 
 Icons:
     - https://heroicons.com/
