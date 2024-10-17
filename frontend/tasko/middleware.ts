@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { ACCESS_TOKEN } from "./constants";
-import Cookies from "js-cookie";
 
 
 export function middleware(request: NextRequest) {
-    const accessToken = Cookies.get(ACCESS_TOKEN);
+    const accessToken = localStorage.getItem(ACCESS_TOKEN);
 
     if (
         !accessToken 
