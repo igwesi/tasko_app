@@ -4,7 +4,7 @@ import dj_database_url
 
 DEBUG = False
 
-ALLOWED_HOSTS += ["tasko-sfnu.onrender.com",]
+ALLOWED_HOSTS += ["tasko-sfnu.onrender.com","tasko-blond.vercel.app"]
 
 DATABASES = {
     'default': dj_database_url.config(
