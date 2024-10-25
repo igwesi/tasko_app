@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: process.env.BACKEND_API,
+    baseURL: 'https://tasko-sfnu.onrender.com/api',
     headers: {
         'Content-Type': 'application/json',
     },

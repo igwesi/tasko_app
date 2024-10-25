@@ -49,7 +49,7 @@ export default function RootLayout({children,}: Readonly<{
           </main>
 
           <footer className="row-start-3 gap-6 absolute bottom-10">
-            <div className="flex row-start-3 gap-9">
+            <div className="flex row-start-4 gap-4">
               <a
                 href="https://github.com/igwesi/Tasko"
                 className="text-sm hover:underline"
