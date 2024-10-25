@@ -31,7 +31,6 @@ const resolver: Resolver<FormData> = async (values) => {
 const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver });
   const [submitted, setSubmitted] = useState(false);
-  const [isAuth, setAuth] = useState(false)
   const router = useRouter();
   
   const onSubmit = handleSubmit(
@@ -51,7 +50,6 @@ const Login = () => {
           setSubmitted(false);
         });
       console.log(data);
-      // setSubmitted(false)
     }
   );
 
