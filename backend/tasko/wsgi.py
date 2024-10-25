@@ -9,8 +9,18 @@ https://docs.djangoproject.com/en/5.1/howto/deployment/wsgi/
 
 import os
 
+import environ
+from pathlib import Path
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tasko.settings')
+
+env = environ.Env()
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent
+
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tasko.settings.'+env("ENVIRONMENT"))
 
 application = get_wsgi_application()

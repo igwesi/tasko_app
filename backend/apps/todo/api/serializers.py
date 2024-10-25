@@ -1,10 +1,15 @@
 from rest_framework import serializers
-from ..models import Todo, SharedTodo, Project, ProjectManager, Task, SharedTask
+from ..models import Todo, SharedTodo, Project, Task, SharedTask
+
 
 class TodoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Todo
         fields = ['title', 'description','completed', 'created_at']
+class UpdateTodoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Todo
+        fields = ['title', 'description','completed']
 
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
@@ -35,48 +40,48 @@ class ProjectSerializer(serializers.ModelSerializer):
         fields = [
             'title', 
             'owner', 
-            'members',
+            # 'members',
             'tasks', 
-            'total_tasks', 
-            'shared_tasks',
-            'total_shared_tasks',
+            # 'total_tasks', 
+            # 'shared_tasks',
+            # 'total_shared_tasks',
             'completed', 
         ]
         ordering = ['-created_at']
 
-    tasks               = TaskSerializer(many=True, read_only=True)
-    shared_tasks        = SharedTasksSerializer(many=True, read_only=True)
-    owner               = serializers.SerializerMethodField()
-    members             = serializers.SerializerMethodField()
-    total_tasks         = serializers.SerializerMethodField()
-    total_shared_tasks  = serializers.SerializerMethodField()
+    # tasks               = TaskSerializer(many=True, read_only=True)
+    # shared_tasks        = SharedTasksSerializer(many=True, read_only=True)
+    # owner               = serializers.SerializerMethodField()
+    # members             = serializers.SerializerMethodField()
+    # total_tasks         = serializers.SerializerMethodField()
+    # total_shared_tasks  = serializers.SerializerMethodField()
     
 
-    def get_owner(self, obj):
-        """
-        Returns the email of the project's owner.
-        """
-        return obj.owner.email
+    # def get_owner(self, obj):
+    #     """
+    #         Returns the email of the project's owner.
+    #     """
+    #     return obj.owner.email
     
-    def get_total_tasks(self, obj):
-        """
-        Returns the total number of tasks in the project.
-        """
-        return obj.tasks.count()
+    # def get_total_tasks(self, obj):
+    #     """
+    #         Returns the total number of tasks in the project.
+    #     """
+    #     return obj.tasks.count()
 
-    def get_total_shared_tasks(self, obj):
-        """
-        Returns the total number of shared tasks in the project.
-        """
-        return len(SharedTasksSerializer(obj.shared_tasks).data)
+    # def get_total_shared_tasks(self, obj):
+    #     """
+    #         Returns the total number of shared tasks in the project.
+    #     """
+    #     return len(SharedTasksSerializer(obj.shared_tasks).data)
     
-    def get_members(self, obj):
-        """
-        Returns a list of emails of the users in the project excluding the owner.
-        """
-        owner_email = obj.owner.email
-        user_emails = [user.email for user in obj.users.all()]
-        return [email for email in user_emails if email != owner_email]
+    # def get_members(self, obj):
+    #     """
+    #         Returns a list of emails of the users in the project excluding the owner.
+    #     """
+    #     owner_email = obj.owner.email
+    #     user_emails = [user.email for user in obj.users.all()]
+    #     return [email for email in user_emails if email != owner_email]
 
     def create(self, validated_data):
         project_instance = Project.objects.create(**validated_data)
@@ -84,7 +89,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """
-        Updates a project with the given validated data.
+            Updates a project with the given validated data.
         """
         instance.title          = validated_data.get('title', instance.title)
         instance.description    = validated_data.get('description', instance.description)
@@ -94,7 +99,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     
     def get_queryset(self):
         """
-        Gets a queryset of projects that the current user owns.
+            Gets a queryset of projects that the current user owns.
         """
         return Project.objects.filter(owner=self.context['request'].user)
     

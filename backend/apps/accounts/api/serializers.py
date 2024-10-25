@@ -4,6 +4,10 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from rest_framework import exceptions, serializers
+from django.contrib.auth import authenticate
+from rest_framework_simplejwt.serializers import RefreshToken
+
+
 User = get_user_model()
 
 
@@ -68,10 +72,8 @@ class UserChangePasswordErrorSerializer(serializers.Serializer):
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(style={"input_type": "password"}, write_only=True)
-    password_retype = serializers.CharField(
-        style={"input_type": "password"}, write_only=True
-    )
+    password = serializers.CharField(style={"input_type": "password"})
+    password_retype = serializers.CharField(style={"input_type": "password"})
 
     default_error_messages = {
         "password_mismatch": _("Password are not matching."),
@@ -83,27 +85,28 @@ class UserCreateSerializer(serializers.ModelSerializer):
         fields = ["email", "password", "password_retype"]
 
     def validate(self, attrs):
+        print(attrs)
         password_retype = attrs.pop("password_retype")
-
+    
         try:
             validate_password(attrs.get("password"))
         except exceptions.ValidationError:
             self.fail("password_invalid")
 
-        if attrs["password"] == password_retype:
-            return attrs
-
-        return self.fail("password_mismatch")
-
-    def create(self, validated_data):
+        if attrs.pop("password") != password_retype:
+            return self.fail("password_mismatch")
+        return attrs
+    
+    def create(self, data):
+        print(data)
         with transaction.atomic():
-            user = User.objects.create_user(**validated_data)
+            if User.objects.filter(email=data['email']).exists():
+                raise serializers.ValidationError('Email already exists.')
 
-            # By default newly registered accounts are inactive.
-            user.is_active = False
-            user.save(update_fields=["is_active"])
-
-        return user
+            user = User.objects.create_user(**data)
+            user.is_active = True
+            user.save()
+            return user
     
 class UserCreateErrorSerializer(serializers.Serializer):
     email = serializers.ListSerializer(child=serializers.EmailField(), required=False)
@@ -111,3 +114,30 @@ class UserCreateErrorSerializer(serializers.Serializer):
     password_retype = serializers.ListSerializer(
         child=serializers.CharField(), required=False
     )
+
+
+class LoginSerializer(serializers.Serializer):  # Using Serializer instead of ModelSerializer for flexibility
+    email    = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        email    = data.get('email')
+        password = data.get('password')
+        data['message']  = ""
+        
+        if not email or not password:
+            data['message'] = "Form Validation Error"
+            return data
+        
+        user = authenticate(request=self.context.get('request'), email=email, password=password)
+        
+        if user is None:
+            if not User.objects.filter(email=email).exists():
+                data['message'] = "User with Email does not exist"                
+            else:
+                data['message'] = "Incorrect password"                
+            return data
+        
+        # Optionally, add the authenticated user to the serialized output
+        data['user'] = user
+        return data

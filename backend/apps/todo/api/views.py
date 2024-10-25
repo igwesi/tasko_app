@@ -1,20 +1,32 @@
 from django.shortcuts import render
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from .serializers import TodoSerializer, ProjectSerializer
+from rest_framework.permissions import IsAuthenticated
+from .serializers import (
+    TodoSerializer, 
+    ProjectSerializer,
+    UpdateTodoSerializer,
+)
 from ..models import Todo, Project
 from django.db.models import Q
 
 
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
+from drf_spectacular.types import OpenApiTypes
 
-class TodosList(APIView):
+
+
+class TodoList(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class   = TodoSerializer
 
-    def get(self, request):
+    @extend_schema(
+        request=TodoSerializer,
+        responses = TodoSerializer,
+    )
+        
+    def get(self, request, pk=None):
         """
         Retrieve all todo items for the current user.
 
@@ -28,110 +40,91 @@ class TodosList(APIView):
             Response: A Response object containing the serialized todo data
                       and a status code of 200.
         """
-        user_todos = Todo.objects.filter(owner=request.user)
-        serialized_todos = TodoSerializer(user_todos, many=True)
-        return Response(serialized_todos.data, status=status.HTTP_200_OK)
-
-
-
-class TodosDetail(APIView):
-    def get(self, request, pk):
-        """
-        Retrieves a specific todo item by its primary key for the current user.
-
-        Args:
-            request (HttpRequest): The request object containing user details.
-            pk (int): The primary key of the todo item to be retrieved.
-
-        Returns:
-            Response: A Response object with the serialized todo item data and a status code of 200,
-                    or a status code of 404 if the todo item does not exist.
-        """
-        try:
-            todo = Todo.objects.get(owner=request.user, pk=pk)
-            serializer = TodoSerializer(todo)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Todo.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+        if pk:
+            todo = self.get_object(pk)
+            serialized = TodoSerializer(todo)
+            return Response(serialized.data, status=status.HTTP_200_OK)
+        else:
+            user_todo_list = Todo.objects.filter(owner=request.user)
+            serialized = TodoSerializer(user_todo_list, many=True)
+        return Response(serialized.data, status=status.HTTP_200_OK)
     
-    
-    def put(self, request, pk):
+    def post(self, request):
         """
-        Updates a todo item identified by the pk parameter.
-
+        Create a new todo item for the current user.
         Args:
-            request: The request object
-            pk: The id of the todo item to update
+            request: The HTTP request object containing user details and todo data.
+        Returns:
+            Response: A Response object containing the serialized todo data
+            and a status code of 201.
+        """
+        serializer = TodoSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(owner=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
+
+class TodoDetail(APIView):
+    """
+        Retrieve, update or delete a todo item for the current user.
+    """
+    permission_classes = [IsAuthenticated]
+    serializer_class   = UpdateTodoSerializer
+
+    @extend_schema(
+        request=TodoSerializer,
+        responses = TodoSerializer,
+    )
+    def get_object(self, pk):
+        return Todo.objects.get(pk=pk)
+
+    def get(self, request, pk, format=None):
+        """
+        Retrieve a todo item for the current user by its primary key.
+        Args:
+            request: The HTTP request object containing user details.
+            pk: The primary key of the todo item to retrieve.
+        Returns:
+            Response: A Response object containing the serialized todo data
+            and a status code of 200.
+        """
+        todo = self.get_object(pk)
+        serialized = TodoSerializer(todo)
+        return Response(serialized.data, status=status.HTTP_200_OK)
+
+    def put(self, request, pk, format=None):
+        """
+        Update a todo item for the current user.
+        Args:
+            request: The HTTP request object containing user details and todo data.
+            pk: The primary key of the todo item to update.
+            format: The format of the request (optional).
 
         Returns:
-            Response: A response object containing the updated todo item data and a status code of 200
+            Response: A Response object containing the serialized todo data
+                    if the update is successful, or the validation errors
+                    and a status code of 400 if the update fails.
         """
-        try:
-            todo = Todo.objects.get(owner=request.user, pk=pk)
-            serializer = TodoSerializer(todo, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Todo.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-   
-   
-    def delete(self, request, pk):
-        """
-        Deletes a todo item identified by the pk parameter.
+        todo = self.get_object(pk)
+        serializer = UpdateTodoSerializer(todo, data=request.data)
 
-        Args:
-            request (Request): The request object
-            pk (int): The id of the todo item to delete
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        Returns:
-            Response: A response object with a status of 204 or 404
-        """
-        try:
-            todo = Todo.objects.get(owner=request.user, pk=pk)
-            todo.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except Todo.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        
-    
-
-    def complete(self, request, pk):
-        """
-        Completes a todo item.
-
-        Args:
-            request (HttpRequest): The request object.
-            pk (int): The primary key of the todo item to be completed.
-
-        Returns:
-            Response: A Response object containing the serialized data of the
-                completed todo item and a status code of 200.
-
-        Raises:
-            Http404: If the requested todo item does not exist.
-        """
-
-        try:
-            todo = Todo.objects.get(owner=request.user, pk=pk)
-            todo.completed = not todo.completed
-            todo.save()
-            serializer = TodoSerializer(todo)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        
-        except Todo.DoesNotExist:
-        
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        
+    def delete(self, request, pk, format=None):
+        todo = self.get_object(pk)
+        todo.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ProjectsList(APIView):
+class ProjectView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class   = ProjectSerializer
 
-    def get(self, request):
+    def get(self, request, pk=None):
         """
         Retrieves all projects associated with the current user either as an owner or as a member.
         This method filters projects based on the current user's involvement, either as the owner or as a user in the project.
@@ -145,15 +138,21 @@ class ProjectsList(APIView):
         """
         query = Q(users=request.user) | Q(owner=request.user)
 
-        all_projects = Project.objects.filter(query)
-        serialized_projects = ProjectSerializer(all_projects, many=True)
-
-        if serialized_projects.data:
-            return Response({
-                "projects": serialized_projects.data, 
-                "message": "Projects found"
-            }, status=status.HTTP_200_OK)
+        if pk:
+            query = query & Q(pk=pk)
+            project = Project.objects.get(query)
+            serialized = ProjectSerializer(project)
+            return Response(serialized.data, status=status.HTTP_200_OK)
         else:
-            return Response({
-                "message": "No projects found"
-            }, status=status.HTTP_200_OK)
+            all_projects = Project.objects.filter(query)
+            serialized_projects = ProjectSerializer(all_projects, many=True)
+
+            if serialized_projects.data:
+                return Response({
+                    "projects": serialized_projects.data, 
+                    "message": "Projects found"
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    "message": "No projects found"
+                }, status=status.HTTP_200_OK)

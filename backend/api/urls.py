@@ -1,6 +1,6 @@
 from django.urls import path, include
-from .views import *
+from .views import API
 
 urlpatterns = [
-    path('', api_view.as_view()),
+    path('', API.as_view(), name="api"),
 ]

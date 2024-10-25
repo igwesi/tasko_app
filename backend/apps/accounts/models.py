@@ -40,7 +40,6 @@ LEVELS = [
 
 class Account(AbstractBaseUser, PermissionsMixin):
     email       = models.EmailField(verbose_name="email", max_length=60, unique=True)
-
     level       = models.CharField(max_length=200, choices=LEVELS, default=1)
 
     date_joined = models.DateTimeField(verbose_name='date joined', auto_now_add=True)
