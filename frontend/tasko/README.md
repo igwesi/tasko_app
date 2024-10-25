@@ -47,3 +47,6 @@ Libraries:
 
 Icons:
     - https://heroicons.com/
+
+https://next-shadcn-dashboard-starter.vercel.app/dashboard/kanban
+https://github.com/Kiranism/next-shadcn-dashboard-starter/tree/main/app/dashboard

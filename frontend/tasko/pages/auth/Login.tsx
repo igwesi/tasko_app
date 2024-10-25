@@ -2,6 +2,8 @@
 import React, { useState } from 'react'
 import { useForm, Resolver } from "react-hook-form";
 import { Input, Button } from '@headlessui/react';
+import { login } from '@/app/auth/auth';
+import { useRouter } from 'next/navigation';
 
 type FormData = {
   email: string;
@@ -29,10 +31,25 @@ const resolver: Resolver<FormData> = async (values) => {
 const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver });
   const [submitted, setSubmitted] = useState(false);
-
+  const [isAuth, setAuth] = useState(false)
+  const router = useRouter();
+  
   const onSubmit = handleSubmit(
     data => {
       setSubmitted(true);
+      login(data.email, data.password)
+       .then((response) => {
+          if (response.status === "success") {
+            router.push('/dashboard/projects');
+          }else{
+            setSubmitted(false);
+            console.log(response);
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          setSubmitted(false);
+        });
       console.log(data);
       // setSubmitted(false)
     }
@@ -68,7 +85,7 @@ const Login = () => {
                 <path
                   d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
               </svg>
-              <Input type='email' placeholder='Email Address' className='grow' defaultValue="john.doe@example.com" data-focus data-hover {...register("email")}/>
+              <Input type='email' placeholder='Email Address' className='grow' defaultValue="john.doe@domain.com" data-focus data-hover {...register("email")}/>
             </div>
             <p className='text-red-500'>{errors.password?.message}</p>
             <div className="input input-bordered flex items-center gap-2">
@@ -82,7 +99,7 @@ const Login = () => {
                   d="M14 6a4 4 0 0 1-4.899 3.899l-1.955 1.955a.5.5 0 0 1-.353.146H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2.293a.5.5 0 0 1 .146-.353l3.955-3.955A4 4 0 1 1 14 6Zm-4-2a.75.75 0 0 0 0 1.5.5.5 0 0 1 .5.5.75.75 0 0 0 1.5 0 2 2 0 0 0-2-2Z"
                   clipRule="evenodd" />
               </svg>
-              <Input type='password' placeholder='********' className='grow' defaultValue="john123" data-focus data-hover {...register("password")} />
+              <Input type='password' placeholder='********' className='grow' defaultValue="john_45#" data-focus data-hover {...register("password")} />
             </div>
 
             {!submitted?<Button type="submit" className='btn btn-success' onClick={onSubmit}>
@@ -104,7 +121,6 @@ const Login = () => {
                 Authenticating...
               </button>
             }
-          
           </form>
         </div>
       </div>
