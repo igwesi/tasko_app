@@ -2,6 +2,10 @@ from ..settings import *
 import dj_database_url
 
 
+DEBUG = False
+
+ALLOWED_HOSTS += ["tasko-sfnu.onrender.com",]
+
 DATABASES = {
     'default': dj_database_url.config(
         default=env("DATABASE_URL"),
@@ -25,3 +29,5 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
