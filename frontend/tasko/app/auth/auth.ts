@@ -1,4 +1,5 @@
 import { get, post } from '@/api';
+
 export const register = async (email:string, password:string) => {
     const json = {
         'email':email,
@@ -8,7 +9,7 @@ export const register = async (email:string, password:string) => {
         const response = await post('/user/register/', json);
         return response.data;
     } catch (error) {
-        console.error(error);
+        console.error("Error while registering", error);
     }
 }
 

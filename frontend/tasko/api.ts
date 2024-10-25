@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: "http://localhost:8000/api",
+    baseURL: process.env.BACKEND_API,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -9,21 +9,12 @@ const api = axios.create({
 
 
 export const get = async(url:string) => {
-    try {
-        const response = await api.get(url);
-        return response.data;
-    } catch (error) {
-        console.error(error);
-    }
+    const response = await api.get(url);
+    return response;
 }
 
-export const post = async(url:string, data:any) => {
-    try {
-        const response = await api.post(url, data);
-        return response.data;
-    } catch (error) {
-        console.error(error);
-    }
+export const post = (url:string, data:any) => {
+    return api.post(url, data);
 }
 
 export const fetchTasks = async () => {
