@@ -38,7 +38,7 @@ const Login = () => {
       setSubmitted(true);
       login(data.email, data.password)
        .then((response) => {
-          if (response.status === "success") {
+          if (response.status === 200) {
             router.push('/dashboard/projects');
           }else{
             setSubmitted(false);
