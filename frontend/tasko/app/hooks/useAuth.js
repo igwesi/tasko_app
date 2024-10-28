@@ -1,3 +1,4 @@
+"use client"
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { AuthActions } from '@/app/auth/utils';
