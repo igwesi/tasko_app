@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { useState, useEffect } from 'react';
-import { AuthActions } from '../auth/utils';
-// import { BACKEND_API } from '@/app/constants';
+import { AuthActions } from '@/app/auth/utils';
 
 
 const useAuth = () => {
@@ -16,6 +15,7 @@ const useAuth = () => {
   const { getToken } = AuthActions();
   // Simulate checking for authentication
   // Simulate network request delay
+
   useEffect(() => {
     const Authenticate = async () => {
       setIsLoading(true);
@@ -43,7 +43,8 @@ const useAuth = () => {
       })
     };
     Authenticate();
-  }, [0]);
+  }, [getToken]);
+
   return { isAuthenticated, setIsAuthenticated, user, isLoading };
 };
 

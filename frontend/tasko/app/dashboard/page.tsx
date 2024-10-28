@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import Profile from '@/pages/dashboard/Profile'
 
 const page = () => {

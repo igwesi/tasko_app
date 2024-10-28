@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useForm, Resolver } from "react-hook-form";
 import { Input, Button } from '@headlessui/react';
 import { useRouter } from 'next/navigation';
@@ -32,7 +32,6 @@ const resolver: Resolver<FormData> = async (values) => {
 const Login = () => {
   const router = useRouter();
   const [error, setError] = useState(null);
-  const [isLoading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false);
   const { login, storeToken, removeTokens } = AuthActions()
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver });
@@ -56,10 +55,6 @@ const Login = () => {
 
   if(isAuthenticated){
     router.push('/dashboard')
-  }
-
-  if(isLoading){
-    return (<h2>Loading ...</h2>)
   }
   
   if(isAuthenticated){

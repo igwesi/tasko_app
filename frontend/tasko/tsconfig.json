@@ -21,6 +21,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "pages/projects/list.jsx", "pages/auth/auth.tsx", "pages/auth/utils.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "pages/projects/list.jsx", "pages/auth/auth.tsx", "pages/auth/utils.jsx", "app/hooks/useAuth.js"],
   "exclude": ["node_modules"]
 }
