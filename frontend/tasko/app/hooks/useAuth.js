@@ -40,7 +40,7 @@ const useAuth = () => {
       })
     };
     Authenticate();
-  }, []);
+  }, [getToken]);
   return { isAuthenticated, user, setIsAuthenticated, isLoading };
 };
 

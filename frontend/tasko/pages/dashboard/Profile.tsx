@@ -8,13 +8,15 @@ const Profile = () => {
         email: ''
     })
     const { getUser } = AuthActions();
+    
     useEffect(()=>{
         getUser().then((response) => {
             if(response.status === "success"){
                 setUser(response.user);
             }
         });
-    }, []);
+    }, [getUser]);
+
     return (
         <>
             <div className="card" id="profile">

@@ -4,7 +4,7 @@ import dj_database_url
 
 DEBUG = False
 
-ALLOWED_HOSTS += ["tasko-sfnu.onrender.com","tasko-blond.vercel.app"]
+ALLOWED_HOSTS += ["tasko-sfnu.onrender.com", "tasko-blond.vercel.app"]
 
 DATABASES = {
     'default': dj_database_url.config(
@@ -16,6 +16,7 @@ DATABASES = {
 
 CORS_ALLOWED_ORIGINS = [
     'https://tasko-blond.vercel.app',
+    "http://localhost:3000",
 ]
 CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
 

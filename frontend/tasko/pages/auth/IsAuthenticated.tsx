@@ -8,7 +8,7 @@ import useAuth from '../../app/hooks/useAuth';
 
 const IsAuthenticated = ({ children }:Readonly<{children: React.ReactNode;}>) => {
   const router = useRouter();
-  const { isAuthenticated, user, isLoading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
     const token = getToken("access")
