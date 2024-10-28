@@ -14,6 +14,11 @@ DATABASES = {
     )
 }
 
+CORS_ALLOWED_ORIGINS = [
+    'https://tasko-blond.vercel.app',
+]
+CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
+
 
 # Email Backend
 EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"

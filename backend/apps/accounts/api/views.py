@@ -54,6 +54,24 @@ class RefreshTokenView(APIView):
         }, status=status.HTTP_400_BAD_REQUEST)
 
 
+class User(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserCurrentSerializer
+
+    def get(self, request, format=None):
+        try:
+            serializer    = UserCurrentSerializer(request.user)
+            return Response({
+                "status":"success",
+                "user": serializer.data
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({
+                "status":"error",
+                "msg": str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+
 class UserView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UserCurrentSerializer

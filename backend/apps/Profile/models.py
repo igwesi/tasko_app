@@ -11,7 +11,7 @@ class Skill(models.Model):
         verbose_name_plural = 'Skills'
 
 class Profile(models.Model):
-    user        = models.OneToOneField(Account, on_delete=models.CASCADE)
+    user        = models.OneToOneField(Account, on_delete=models.CASCADE, related_name='profile')
     bio         = models.TextField(blank=True)
     avatar      = models.ImageField(upload_to='avatars/', blank=True, null=True)
     skills      = models.ManyToManyField(Skill, related_name='profiles', blank=True)
