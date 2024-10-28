@@ -4,7 +4,7 @@ import { ACCESS_TOKEN, BACKEND_API } from "@/app/constants";
 
 
 const api = axios.create({
-    baseURL: process.env.BACKEND_API,
+    baseURL: BACKEND_API,
     headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',

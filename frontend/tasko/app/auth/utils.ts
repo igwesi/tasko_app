@@ -61,10 +61,10 @@ const login = async (email:string, password:string) => {
     }
 };
 
-const getUser = async (token:string) => {
+const getUser = async () => {
     try {
-        const response = (await get('/user/me')).headers["Authorization"] = token;
-        return response;
+        const response = (await get('/user/me'));
+        return response.data;
     } catch (error) {
         console.error(error);
     }

@@ -1,17 +1,36 @@
-import React from 'react'
-import useAuth from '@/app/hooks/useAuth';
+"use client"
+import React, {useState, useEffect } from "react";
+import { AuthActions } from "@/app/auth/utils";
+
 
 const Profile = () => {
-    const { user } = useAuth();
+    const [user, setUser] = useState({
+        email: ''
+    })
+    const { getUser } = AuthActions();
+    useEffect(()=>{
+        getUser().then((response) => {
+            if(response.status === "success"){
+                setUser(response.user);
+            }
+        });
+    }, []);
     return (
-        <div className='border border-slate-500' id="profile">
-        <h1 className='font-bold'>Greetings!</h1>
-        {user && (
-            <div className=''>
-                <h2>Email: {user.email}</h2>
+        <>
+            <div className="card" id="profile">
+                
+                <div className="card-header">
+                    <h3 className="text font-bold">Profile</h3>
+                </div>
+
+                <div className="card-body">
+                    <p>Email: {user.email}</p>
+                </div>
+                <div className="card-footer">
+                    <a href="#" className="btn btn-primary">Edit Profile</a>
+                </div>
             </div>
-        )}
-        </div>
+        </>
     )
 }
 
