@@ -1,3 +1,60 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@tailwind variants;
+
+.container{
+    width:100vw;
+    max-width: 95vw;
+    align-content: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.container-sm{
+    max-width: 640px;
+}
+.container-md{
+    max-width: 768px;
+}
+.container-lg{
+    max-width: 1024px;
+} 
+.container-xl{
+    max-width: 1280px;
+}
+.container-2xl{
+    max-width: 1536px;
+}
+
+
+@keyframes animate-spin {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+        transform:scale(1);
+    }
+}
+
+#profile{
+    padding: 1rem;
+    display: flex;
+    overflow: hidden;
+    max-width: 400px;
+    max-height: 600px;
+    margin-top: 2.5rem;
+    border-radius: 10px;
+    flex-direction: column;
+    animation: animate-spin 1s forwards;
+    animation-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
+    transition: all 0.3s ease-in-out;
+}
+
+#loader{
+    animation: animate-spin 1s forwards;
+    animation-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
+    transition: all 0.3s ease-in-out;
+}

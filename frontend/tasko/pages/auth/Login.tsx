@@ -1,9 +1,10 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useForm, Resolver } from "react-hook-form";
 import { Input, Button } from '@headlessui/react';
-import { login } from '@/app/auth/auth';
 import { useRouter } from 'next/navigation';
+import { AuthActions } from '@/app/auth/utils';
+import useAuth from '@/app/hooks/useAuth';
 
 type FormData = {
   email: string;
@@ -29,28 +30,41 @@ const resolver: Resolver<FormData> = async (values) => {
 };
 
 const Login = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver });
-  const [submitted, setSubmitted] = useState(false);
   const router = useRouter();
+  const [error, setError] = useState(null);
+  const [isLoading, setLoading] = useState(false)
+  const [submitted, setSubmitted] = useState(false);
+  const { login, storeToken, removeTokens } = AuthActions()
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver });
+  const { isAuthenticated, setIsAuthenticated } = useAuth();
   
-  const onSubmit = handleSubmit(
-    data => {
-      setSubmitted(true);
-      login(data.email, data.password)
-       .then((response) => {
-          if (response?.status === 200) {
-            router.push('/dashboard/projects');
-          }else{
-            setSubmitted(false);
-            console.log(response);
-          }
-        })
-        .catch(error => {
-          console.log(error);
-          setSubmitted(false);
-        });
+  const onSubmit = async(data: FormData) => {
+    setError(null);
+    removeTokens();
+    setSubmitted(true);
+    const res = await login(data.email, data.password);
+    if(res.status === "success"){
+      storeToken(res['token']['access'], "access");
+      storeToken(res['token']['refresh'], "refresh");
+      setIsAuthenticated(true);
+    }else{
+      setSubmitted(false);
+      setIsAuthenticated(false);
     }
-  );
+    setError(res.message)
+  }
+
+  if(isAuthenticated){
+    router.push('/dashboard')
+  }
+
+  if(isLoading){
+    return (<h2>Loading ...</h2>)
+  }
+  
+  if(isAuthenticated){
+    window.location.href = '/dashboard'
+  }
 
   return (
     <div className="flex flex-col items-center justify-center gap-20">
@@ -58,8 +72,15 @@ const Login = () => {
         <div className="hidden my-auto md:block">
           <div className="mockup-code">
             <pre data-prefix="$"><code>login user</code></pre>
-            <pre data-prefix=">" className="text-warning"><code>Authenticating...</code></pre>
-            <pre data-prefix=">" className="text-success"><code>Done!</code></pre>
+            {submitted?
+            <pre data-prefix=">" className="text-warning">
+              <code className="items-center my-auto">
+               <>Authenticating In<span className="loading loading-dots loading-sm"></span></>
+              </code>
+            </pre>:null}
+            <pre data-prefix=">" className="text-success"><code>
+              {error}
+            </code></pre>
           </div>
         </div>
 
@@ -69,7 +90,9 @@ const Login = () => {
         {/* Form Section */}
         <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl p-4">
           <div className='font-bold text-xs'><code>Authentication</code></div>
-          <form onSubmit={onSubmit} className='flex flex-col col-start-3 gap-4'>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col col-start-3 gap-4'>
             <p className='text-red-500'>{errors.email?.message}</p>
             <div className="input input-bordered flex items-center gap-2">
               <svg
@@ -84,7 +107,9 @@ const Login = () => {
               </svg>
               <Input type='email' placeholder='Email Address' className='grow' defaultValue="john.doe@domain.com" data-focus data-hover {...register("email")}/>
             </div>
+
             <p className='text-red-500'>{errors.password?.message}</p>
+            
             <div className="input input-bordered flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -98,8 +123,7 @@ const Login = () => {
               </svg>
               <Input type='password' placeholder='********' className='grow' defaultValue="john_45#" data-focus data-hover {...register("password")} />
             </div>
-
-            {!submitted?<Button type="submit" className='btn btn-success' onClick={onSubmit}>
+            {!submitted?<Button role="submit" type="submit" className='btn btn-success'>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 16 16"

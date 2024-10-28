@@ -23,24 +23,24 @@ export const metadata: Metadata = {
   }
 }
 
-import Theme from "../components/Theme";
+import ThemeToggle from "../components/Theme";
 import Navbar from "@/components/Navbar";
+
 
 export default function RootLayout({children,}: Readonly<{
   children: React.ReactNode;
 }>) {
-  
+
   return (
     <html lang="en" data-theme="emerald">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <div className="flex flex-col items-center justify-items-center min-h-screen max-h-screen p-8 pb-8 gap-20 font-[family-name:var(--font-geist-sans)]">       
           <div className="flex flex-row w-full justify-between items-center">
             <div className="items-start my-auto">
               <Navbar/>
             </div>
             <div className="items-end my-auto">
-              <Theme/>
+              <ThemeToggle/>
             </div>
           </div>
           
@@ -48,8 +48,8 @@ export default function RootLayout({children,}: Readonly<{
             {children}
           </main>
 
-          <footer className="row-start-3 gap-6 absolute bottom-10">
-            <div className="flex row-start-4 gap-4">
+          <footer className="row-start-3 gap-4 absolute bottom-10">
+            <div className="flex row-start-4 gap-2">
               <a
                 href="https://github.com/igwesi/Tasko"
                 className="text-sm hover:underline"

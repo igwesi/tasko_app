@@ -1,10 +1,15 @@
 import React from 'react'
+import IsAuthenticated from '@/pages/auth/IsAuthenticated'
 
-const layout = ({children, }: { children: React.ReactNode }) => {
+export default function Dashboardlayout({
+    children,}: Readonly<{
+    children: React.ReactNode;
+  }>) {  
     return (
         <div>
-            {children}
+            <IsAuthenticated>
+                {children}
+            </IsAuthenticated>
         </div>
-    )
+     )
 }
-export default layout
