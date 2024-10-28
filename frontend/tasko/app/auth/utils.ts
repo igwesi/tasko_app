@@ -20,18 +20,21 @@ const removeTokens = () => {
     Cookies.remove("accessToken");
     Cookies.remove("refreshToken");
 };
-    
+  
+
+const formatResponse = (response:any) =>{
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+}
+
 const handleJWTRefresh = async() => {
     try{
         const response = await post('/token/refresh', getToken("refresh"));
-        const data  = await response.data;
-        storeToken(data.access_token, "access");
-        storeToken(data.refresh_token, "refresh");
-        return true;
+        return response.data;
     }catch(error){
         console.error("Error while refreshing token", error);
-        removeTokens();
-        return false;
     }
 };
 
@@ -44,21 +47,17 @@ const register = async (email:string, password:string) => {
         const response = await post('/user/register/', json);
         return response.data;
     } catch (error) {
-        console.error("Error while registering", error);
+        console.error(error);
     }
 };
 
-const login = async (email:string, password:string) => {
+const login = async(email:string, password:string): Promise<any> => {
     const json = {
         'email':email,
         'password':password
     }
-    try{
-        const response = await post('/user/login/', json);
-        return response.data;
-    } catch (error){
-        console.error("Error while logging in", error);
-    }
+    const response = await post('/user/login/', json);
+    return response.data;
 };
 
 const getUser = async () => {
@@ -71,12 +70,8 @@ const getUser = async () => {
 };
 
 const logout = async () => {
-    try {
-        const response = await get('/user/logout/');
-        return response;
-    } catch (error) {
-        console.error(error);
-    }
+    removeTokens();
+    return true;
 };
 
 export const AuthActions = () => {

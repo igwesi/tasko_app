@@ -37,20 +37,28 @@ const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver });
   const { isAuthenticated, setIsAuthenticated } = useAuth();
   
-  const onSubmit = async(data: FormData) => {
+  const onSubmit = (data: FormData) => {
     setError(null);
     removeTokens();
     setSubmitted(true);
-    const res = await login(data.email, data.password);
-    if(res.status === "success"){
-      storeToken(res['token']['access'], "access");
-      storeToken(res['token']['refresh'], "refresh");
-      setIsAuthenticated(true);
-    }else{
+
+    login(data.email, data.password)
+    .then((res) => {
+      const data = res;
+      if(data.status === "success"){
+        storeToken(data.token.access, "access");
+        storeToken(data.token.refresh, "refresh");
+        setError(data.message)
+        setSubmitted(false);
+        setIsAuthenticated(true);
+      }
+    }).catch((err) => {
+      console.log("Catch: "+err);
       setSubmitted(false);
       setIsAuthenticated(false);
-    }
-    setError(res.message)
+      setError(err.message);
+    });
+
   }
 
   if(isAuthenticated){
@@ -87,7 +95,7 @@ const Login = () => {
           <div className='font-bold text-xs'><code>Authentication</code></div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col col-start-3 gap-4'>
+          <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col col-start-3 gap-4' method="POST">
             <p className='text-red-500'>{errors.email?.message}</p>
             <div className="input input-bordered flex items-center gap-2">
               <svg

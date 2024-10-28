@@ -14,9 +14,9 @@ const useAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   
   useEffect(() => {
-    const Authenticate = () => {
+    const Authenticate = async() => {
       setIsLoading(true);
-      axios.create(
+      await axios.create(
         {
           baseURL: BACKEND_API,
           headers: {
@@ -34,14 +34,16 @@ const useAuth = () => {
         }
         setIsLoading(false);
       }).catch((error)=>{
+        if(error.response.status === 401){
+          console.log("Token Expired");
+        }
         setIsAuthenticated(false);
         setIsLoading(false);
-        console.error('Error while fetching user', error);
       })
     };
     Authenticate();
   }, [getToken]);
-  return { isAuthenticated, user, setIsAuthenticated, isLoading };
+  return { isAuthenticated, user, setIsAuthenticated, isLoading, setIsLoading };
 };
 
 export default useAuth;
